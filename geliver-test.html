@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Geliver API Test</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: #fff;
+  margin: 0;
+  padding: 20px;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  background: rgba(255,255,255,0.1);
+  border-radius: 15px;
+  padding: 30px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+h1 {
+  text-align: center;
+  color: #FF6B35;
+  margin-bottom: 30px;
+  font-size: 28px;
+}
+
+.test-section {
+  background: rgba(0,0,0,0.3);
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-left: 4px solid #FF6B35;
+}
+
+.test-section h3 {
+  color: #FF6B35;
+  margin-top: 0;
+}
+
+.btn {
+  background: #FF6B35;
+  color: #fff;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  margin: 5px;
+  transition: all 0.3s ease;
+}
+
+.btn:hover {
+  background: #e55a2b;
+  transform: translateY(-2px);
+}
+
+.btn:disabled {
+  background: #666;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.result-box {
+  background: rgba(0,0,0,0.5);
+  border-radius: 8px;
+  padding: 15px;
+  margin-top: 15px;
+  font-family: monospace;
+  font-size: 12px;
+  white-space: pre-wrap;
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+.success {
+  border-left-color: #28a745;
+  background: rgba(40,167,69,0.1);
+}
+
+.error {
+  border-left-color: #dc3545;
+  background: rgba(220,53,69,0.1);
+}
+
+.info-box {
+  background: rgba(23,162,184,0.2);
+  border: 1px solid #17a2b8;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+.token-info {
+  background: rgba(255,193,7,0.2);
+  border: 1px solid #ffc107;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+.back-btn {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  background: #6c757d;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.back-btn:hover {
+  background: #5a6268;
+}
+
+.status-indicator {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.status-success { background: #28a745; }
+.status-error { background: #dc3545; }
+.status-warning { background: #ffc107; }
+.status-info { background: #17a2b8; }
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.form-group input, .form-group textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 5px;
+  background: rgba(0,0,0,0.3);
+  color: #fff;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.form-group input::placeholder, .form-group textarea::placeholder {
+  color: #aaa;
+}
+</style>
+</head>
+<body>
+
+<a href="ana-sayfa.html" class="back-btn">← Ana Sayfa</a>
+
+<div class="container">
+  <h1>📦 Geliver API Test Merkezi</h1>
+  
+  <!-- Token Bilgisi -->
+  <div class="token-info">
+    <h3>🔑 Token Bilgileri</h3>
+    <p><strong>Token:</strong> 43f1ee6d-a835-4c35-ab33-d34df37d5821</p>
+    <p><strong>IP Kısıtlaması:</strong> ❌ Kapalı (Her yerden erişilebilir)</p>
+    <p><strong>Durum:</strong> <span class="status-indicator status-success"></span>Aktif</p>
+  </div>
+
+  <!-- API Dokümantasyon Arama -->
+  <div class="test-section">
+    <h3>📚 0. API Dokümantasyon Arama</h3>
+    <p>Geliver'in gerçek API dokümantasyonunu bulalım.</p>
+    <button class="btn" onclick="searchDocumentation()">Dokümantasyon Ara</button>
+    <div id="docResult" class="result-box" style="display:none;"></div>
+  </div>
+
+  <!-- API Bağlantı Testi -->
+  <div class="test-section">
+    <h3>🔗 1. API Bağlantı Testi</h3>
+    <p>Geliver API'sine bağlanabilir miyiz kontrol edelim.</p>
+    <button class="btn" onclick="testConnection()">Bağlantı Test Et</button>
+    <div id="connectionResult" class="result-box" style="display:none;"></div>
+  </div>
+
+  <!-- Endpoint Keşfi -->
+  <div class="test-section">
+    <h3>🔍 2. Endpoint Keşfi</h3>
+    <p>Mevcut API endpoint'lerini keşfedelim.</p>
+    <button class="btn" onclick="discoverEndpoints()">Endpoint'leri Keşfet</button>
+    <div id="endpointResult" class="result-box" style="display:none;"></div>
+  </div>
+
+  <!-- Sipariş Gönderme Testi -->
+  <div class="test-section">
+    <h3>📋 3. Test Siparişi Gönderme</h3>
+    <p>Örnek bir sipariş gönderip API'nin nasıl çalıştığını görelim.</p>
+    
+    <div class="form-group">
+      <label>Alıcı Adı:</label>
+      <input type="text" id="receiverName" value="Test Müşteri" placeholder="Alıcı adı">
+    </div>
+    
+    <div class="form-group">
+      <label>Telefon:</label>
+      <input type="text" id="receiverPhone" value="5551234567" placeholder="Telefon numarası">
+    </div>
+    
+    <div class="form-group">
+      <label>Adres:</label>
+      <textarea id="receiverAddress" rows="3" placeholder="Tam adres">Test Mahallesi, Test Sokak No:1, Çankaya/Ankara</textarea>
+    </div>
+    
+    <button class="btn" onclick="sendTestOrder()">Test Siparişi Gönder</button>
+    <div id="orderResult" class="result-box" style="display:none;"></div>
+  </div>
+
+  <!-- Takip Testi -->
+  <div class="test-section">
+    <h3>📍 4. Kargo Takip Testi</h3>
+    <p>Kargo takip numarası ile durumu sorgulayalım.</p>
+    
+    <div class="form-group">
+      <label>Takip Numarası:</label>
+      <input type="text" id="trackingNumber" placeholder="Takip numarası girin">
+    </div>
+    
+    <button class="btn" onclick="trackOrder()">Kargo Durumu Sorgula</button>
+    <div id="trackingResult" class="result-box" style="display:none;"></div>
+  </div>
+
+  <!-- Otomatik Entegrasyon Testi -->
+  <div class="test-section">
+    <h3>⚡ 5. Otomatik Entegrasyon Testi</h3>
+    <p>Sitenizden gelen siparişleri otomatik olarak Geliver'e gönderme testi.</p>
+    <button class="btn" onclick="testAutoIntegration()">Otomatik Entegrasyon Test Et</button>
+    <div id="integrationResult" class="result-box" style="display:none;"></div>
+  </div>
+
+  <!-- Geliver Panel Kontrolü -->
+  <div class="info-box">
+    <h3>🔍 Geliver Panel Kontrol Listesi</h3>
+    <p><strong>Şu adımları takip edin:</strong></p>
+    <ol style="color: #fff; line-height: 1.8;">
+      <li>Geliver paneline giriş yapın: <a href="https://app.geliver.io" target="_blank" style="color: #FF6B35;">app.geliver.io</a></li>
+      <li>API Tokenlar bölümünde <strong>"Dokümantasyon"</strong> linki var mı kontrol edin</li>
+      <li>Panel içinde <strong>"Entegrasyonlar"</strong> veya <strong>"API"</strong> menüsü arayın</li>
+      <li>Token oluştururken <strong>örnek kod</strong> gösteriliyor mu bakın</li>
+      <li>Müşteri hizmetlerinden API dokümantasyonu isteyin</li>
+      <li><strong>Curl örnekleri:</strong> Dokümantasyonda tüm curl istekleri mevcut</li>
+    </ol>
+  </div>
+
+  <!-- Curl Örnekleri Test Bölümü -->
+  <div class="test-section">
+    <h3>📋 6. Curl Örnekleri Test</h3>
+    <p>Dokümantasyondaki curl örneklerini JavaScript'e çevirip test edelim.</p>
+    
+    <div class="form-group">
+      <label>Curl Komutu:</label>
+      <textarea id="curlCommand" rows="8" placeholder="Dokümantasyondan curl komutunu buraya yapıştırın...">curl --request POST \
+  --url https://api.geliver.io/api/v1/shipments \
+  --header 'Authorization: Bearer 43f1ee6d-a835-4c35-ab33-d34df37d5821' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "test": true,
+    "senderAddressID": "b6029b1b-cc61-4263-95c3-2bd17614c9d6",
+    "returnAddressID": "b6029b1b-cc61-4263-95c3-2bd17614c9d6",
+    "length": "10",
+    "height": "10", 
+    "width": "10",
+    "distanceUnit": "cm",
+    "weight": "1",
+    "massUnit": "kg",
+    "items": [{"title":"test product", "quantity":1}],
+    "recipientAddress":{
+      "name": "Test Company Name",
+      "email": "Test Email", 
+      "phone": "+905051234567",
+      "address1": "Celal Bayar Üniversitesi Teknokenti Daire 102",
+      "countryCode": "TR",
+      "cityCode": "45",
+      "districtName": "Yunusemre"
+    },
+    "productPaymentOnDelivery":false,
+    "order": {
+      "sourceCode": "API",
+      "sourceIdentifier": "https://magazaadresiniz.com", 
+      "orderNumber": "ABC12333322",
+      "totalAmount": 150,
+      "totalAmountCurrency": "TL"
+    }
+  }'</textarea>
+    </div>
+    
+    <button class="btn" onclick="testCurlCommand()">Curl Komutunu Test Et</button>
+    <div id="curlResult" class="result-box" style="display:none;"></div>
+  </div>
+
+  <!-- Sistem Durumu -->
+  <div class="info-box">
+    <h3>📊 Sistem Durumu</h3>
+    <div id="systemStatus">
+      <p><span class="status-indicator status-info"></span>Sistem hazırlanıyor...</p>
+    </div>
+  </div>
+</div>
+
+<script>
+// Geliver API Token - YENİ TOKEN (IP kısıtlaması yok)
+const GELIVER_TOKEN = '43f1ee6d-a835-4c35-ab33-d34df37d5821';
+
+// Geliver API'nin gerçek base URL'i (dokümantasyondan)
+const GELIVER_BASE_URL = 'https://api.geliver.io/api/v1';
+
+// Farklı base URL'leri deneyelim
+const POSSIBLE_BASE_URLS = [
+  'https://api.geliver.io/api/v1',
+  'https://api.geliver.io',
+  'https://app.geliver.io/api',
+  'https://geliver.io/api',
+  'https://api.geliver.com',
+  'https://app.geliver.io/apitokens',
+  'https://panel.geliver.io/api'
+];
+
+// Sistem durumunu güncelle
+function updateSystemStatus(message, type = 'info') {
+  const statusEl = document.getElementById('systemStatus');
+  const statusClass = `status-${type}`;
+  statusEl.innerHTML = `<p><span class="status-indicator ${statusClass}"></span>${message}</p>`;
+}
+
+// Sonuç gösterme fonksiyonu
+function showResult(elementId, data, isError = false) {
+  const element = document.getElementById(elementId);
+  element.style.display = 'block';
+  element.className = `result-box ${isError ? 'error' : 'success'}`;
+  
+  if (typeof data === 'object') {
+    element.textContent = JSON.stringify(data, null, 2);
+  } else {
+    element.textContent = data;
+  }
+}
+
+// 0. API Dokümantasyon Arama
+async function searchDocumentation() {
+  updateSystemStatus('API dokümantasyonu aranıyor...', 'warning');
+  
+  const docUrls = [
+    'https://geliver.io/docs',
+    'https://geliver.io/api-docs',
+    'https://app.geliver.io/docs',
+    'https://docs.geliver.io',
+    'https://api.geliver.io/docs',
+    'https://geliver.io/developer',
+    'https://geliver.io/api',
+    'https://app.geliver.io/help',
+    'https://geliver.io/.well-known/api',
+    'https://geliver.io/swagger',
+    'https://api.geliver.io/swagger'
+  ];
+  
+  let docResults = [];
+  
+  for (const url of docUrls) {
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Accept': 'text/html,application/json,*/*'
+        }
+      });
+      
+      docResults.push({
+        url: url,
+        status: response.status,
+        statusText: response.statusText,
+        contentType: response.headers.get('content-type'),
+        found: response.ok
+      });
+      
+    } catch (error) {
+      docResults.push({
+        url: url,
+        error: error.message,
+        found: false
+      });
+    }
+  }
+  
+  showResult('docResult', {
+    message: 'API dokümantasyon arama sonuçları',
+    results: docResults,
+    foundDocs: docResults.filter(r => r.found),
+    recommendations: [
+      'Geliver müşteri hizmetlerini arayın',
+      'Panel içinde API dokümantasyonu olup olmadığını kontrol edin',
+      'Token oluşturma sayfasında örnek kod var mı bakın'
+    ],
+    timestamp: new Date().toLocaleString('tr-TR')
+  });
+  
+  const foundCount = docResults.filter(r => r.found).length;
+  if (foundCount > 0) {
+    updateSystemStatus(`📚 ${foundCount} dokümantasyon kaynağı bulundu!`, 'success');
+  } else {
+    updateSystemStatus('📚 Dokümantasyon bulunamadı - Geliver ile iletişime geçin', 'warning');
+  }
+}
+
+// 1. API Bağlantı Testi - Geliştirilmiş
+async function testConnection() {
+  updateSystemStatus('API bağlantısı test ediliyor...', 'warning');
+  
+  try {
+    let allResults = [];
+    
+    // Her base URL için test et
+    for (const baseUrl of POSSIBLE_BASE_URLS) {
+      console.log(`Testing base URL: ${baseUrl}`);
+      
+      const endpoints = ['/v1/test', '/test', '/api/test', '/health', '/status', '/', '/api'];
+      
+      for (const endpoint of endpoints) {
+        try {
+          const fullUrl = baseUrl + endpoint;
+          console.log(`Testing: ${fullUrl}`);
+          
+          const response = await fetch(fullUrl, {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${GELIVER_TOKEN}`,
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            }
+          });
+          
+          let responseData = null;
+          let responseText = '';
+          
+          try {
+            responseText = await response.text();
+            if (responseText) {
+              responseData = JSON.parse(responseText);
+            }
+          } catch (parseError) {
+            // JSON parse edilemezse text olarak sakla
+            responseData = responseText;
+          }
+          
+          allResults.push({
+            baseUrl: baseUrl,
+            endpoint: endpoint,
+            fullUrl: fullUrl,
+            status: response.status,
+            statusText: response.statusText,
+            success: response.ok,
+            responseData: responseData,
+            responseText: responseText.substring(0, 200) // İlk 200 karakter
+          });
+          
+        } catch (error) {
+          allResults.push({
+            baseUrl: baseUrl,
+            endpoint: endpoint,
+            fullUrl: baseUrl + endpoint,
+            error: error.message,
+            success: false
+          });
+        }
+      }
+    }
+    
+    showResult('connectionResult', {
+      message: 'Gelişmiş API bağlantı testi tamamlandı',
+      totalTests: allResults.length,
+      successfulTests: allResults.filter(r => r.success).length,
+      results: allResults,
+      timestamp: new Date().toLocaleString('tr-TR')
+    });
+    
+    const successCount = allResults.filter(r => r.success).length;
+    if (successCount > 0) {
+      updateSystemStatus(`✅ ${successCount} başarılı bağlantı bulundu!`, 'success');
+    } else {
+      updateSystemStatus('❌ Hiçbir endpoint çalışmıyor - API dokümantasyonu gerekli', 'error');
+    }
+    
+  } catch (error) {
+    showResult('connectionResult', `Bağlantı hatası: ${error.message}`, true);
+    updateSystemStatus('❌ API bağlantısı başarısız', 'error');
+  }
+}
+
+// 2. Endpoint Keşfi
+async function discoverEndpoints() {
+  updateSystemStatus('Endpoint\'ler keşfediliyor...', 'warning');
+  
+  const commonEndpoints = [
+    '/v1/shipments',
+    '/v1/tracking',
+    '/v1/rates',
+    '/v1/locations',
+    '/v1/services',
+    '/api/shipments',
+    '/api/tracking',
+    '/api/rates',
+    '/shipments',
+    '/tracking',
+    '/rates'
+  ];
+  
+  let allDiscoveries = [];
+  
+  // Her base URL için endpoint'leri test et
+  for (const baseUrl of POSSIBLE_BASE_URLS) {
+    for (const endpoint of commonEndpoints) {
+      try {
+        const fullUrl = baseUrl + endpoint;
+        const response = await fetch(fullUrl, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${GELIVER_TOKEN}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        allDiscoveries.push({
+          baseUrl: baseUrl,
+          endpoint: endpoint,
+          fullUrl: fullUrl,
+          status: response.status,
+          method: 'GET',
+          available: response.status !== 404,
+          success: response.ok
+        });
+        
+      } catch (error) {
+        allDiscoveries.push({
+          baseUrl: baseUrl,
+          endpoint: endpoint,
+          fullUrl: baseUrl + endpoint,
+          error: error.message,
+          available: false,
+          success: false
+        });
+      }
+    }
+  }
+  
+  showResult('endpointResult', {
+    message: 'Endpoint keşif sonuçları',
+    totalTests: allDiscoveries.length,
+    discoveries: allDiscoveries,
+    availableEndpoints: allDiscoveries.filter(d => d.available),
+    successfulEndpoints: allDiscoveries.filter(d => d.success),
+    timestamp: new Date().toLocaleString('tr-TR')
+  });
+  
+  const availableCount = allDiscoveries.filter(d => d.available).length;
+  updateSystemStatus(`🔍 Endpoint keşfi tamamlandı - ${availableCount} endpoint bulundu`, 'info');
+}
+
+// 3. Test Siparişi Gönderme - Gerçek Geliver API formatı
+async function sendTestOrder() {
+  updateSystemStatus('Test siparişi gönderiliyor...', 'warning');
+  
+  // Geliver API dokümantasyonundaki gerçek format
+  const orderData = {
+    test: true,
+    senderAddressID: "b6029b1b-cc61-4263-95c3-2bd17614c9d6", // Örnek ID
+    returnAddressID: "b6029b1b-cc61-4263-95c3-2bd17614c9d6",
+    length: "10",
+    height: "10",
+    width: "10",
+    distanceUnit: "cm",
+    weight: "1",
+    massUnit: "kg",
+    items: [
+      {
+        title: document.getElementById('receiverName').value + " için ürün",
+        quantity: 1
+      }
+    ],
+    recipientAddress: {
+      name: document.getElementById('receiverName').value,
+      email: "test@example.com",
+      phone: document.getElementById('receiverPhone').value,
+      address1: document.getElementById('receiverAddress').value,
+      countryCode: "TR",
+      cityCode: "06", // Ankara
+      districtName: "Çankaya"
+    },
+    productPaymentOnDelivery: false,
+    order: {
+      sourceCode: "API",
+      sourceIdentifier: "https://test-site.com",
+      orderNumber: "TEST-" + Date.now(),
+      totalAmount: 150,
+      totalAmountCurrency: "TL"
+    }
+  };
+  
+  try {
+    // Gerçek Geliver API endpoint'i
+    const response = await fetch(GELIVER_BASE_URL + '/shipments', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${GELIVER_TOKEN}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(orderData)
+    });
+    
+    let result = null;
+    try {
+      result = await response.json();
+    } catch (e) {
+      result = await response.text();
+    }
+    
+    showResult('orderResult', {
+      message: 'Geliver API test sipariş sonucu',
+      endpoint: GELIVER_BASE_URL + '/shipments',
+      status: response.status,
+      success: response.ok,
+      sentData: orderData,
+      responseData: result,
+      timestamp: new Date().toLocaleString('tr-TR')
+    }, !response.ok);
+    
+    if (response.ok) {
+      updateSystemStatus('✅ Test siparişi başarıyla gönderildi!', 'success');
+    } else {
+      updateSystemStatus('❌ Test siparişi gönderilemedi', 'error');
+    }
+    
+  } catch (error) {
+    showResult('orderResult', `Sipariş gönderme hatası: ${error.message}`, true);
+    updateSystemStatus('❌ Sipariş gönderme başarısız', 'error');
+  }
+}
+
+// 4. Kargo Takip Testi - Tüm base URL'leri dene
+async function trackOrder() {
+  const trackingNumber = document.getElementById('trackingNumber').value;
+  
+  if (!trackingNumber) {
+    alert('Lütfen takip numarası girin!');
+    return;
+  }
+  
+  updateSystemStatus('Kargo durumu sorgulanıyor...', 'warning');
+  
+  let allResults = [];
+  
+  // Farklı tracking endpoint formatlarını dene
+  const endpoints = [
+    `/v1/tracking/${trackingNumber}`,
+    `/api/tracking/${trackingNumber}`,
+    `/tracking/${trackingNumber}`,
+    `/api/v1/tracking/${trackingNumber}`,
+    `/v1/shipments/${trackingNumber}/track`,
+    `/api/shipments/${trackingNumber}/track`
+  ];
+  
+  for (const baseUrl of POSSIBLE_BASE_URLS) {
+    for (const endpoint of endpoints) {
+      try {
+        const fullUrl = baseUrl + endpoint;
+        const response = await fetch(fullUrl, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${GELIVER_TOKEN}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        let result = null;
+        try {
+          result = await response.json();
+        } catch (e) {
+          result = await response.text();
+        }
+        
+        allResults.push({
+          baseUrl: baseUrl,
+          endpoint: endpoint,
+          fullUrl: fullUrl,
+          trackingNumber: trackingNumber,
+          status: response.status,
+          success: response.ok,
+          data: result
+        });
+        
+      } catch (error) {
+        allResults.push({
+          baseUrl: baseUrl,
+          endpoint: endpoint,
+          fullUrl: baseUrl + endpoint,
+          trackingNumber: trackingNumber,
+          error: error.message,
+          success: false
+        });
+      }
+    }
+  }
+  
+  showResult('trackingResult', {
+    message: 'Kargo takip sorgu sonuçları',
+    trackingNumber: trackingNumber,
+    totalAttempts: allResults.length,
+    successfulAttempts: allResults.filter(r => r.success).length,
+    results: allResults,
+    timestamp: new Date().toLocaleString('tr-TR')
+  });
+  
+  const successCount = allResults.filter(r => r.success).length;
+  if (successCount > 0) {
+    updateSystemStatus(`✅ ${successCount} başarılı takip sorgusu!`, 'success');
+  } else {
+    updateSystemStatus('❌ Hiçbir endpoint takip bilgisi vermiyor', 'error');
+  }
+}
+
+// 5. Otomatik Entegrasyon Testi - Tüm base URL'leri dene
+async function testAutoIntegration() {
+  updateSystemStatus('Otomatik entegrasyon test ediliyor...', 'warning');
+  
+  // Örnek sipariş verisi (sitenizden gelecek format)
+  const mockOrder = {
+    siparisNo: '#' + Date.now(),
+    tarih: new Date().toLocaleDateString('tr-TR'),
+    musteri: 'Test Müşteri',
+    telefon: '5551234567',
+    il: 'Ankara',
+    ilce: 'Çankaya',
+    adres: 'Test Mahallesi, Test Sokak No:1',
+    tutar: '199TL',
+    adet: '1 Adet',
+    urunAdi: 'Test Ürün',
+    odemeYontemi: 'Kapıda Ödeme'
+  };
+  
+  // Siparişi Geliver formatına çevir
+  const geliverOrder = {
+    reference: mockOrder.siparisNo,
+    sender: {
+      name: "Şirketiniz",
+      phone: "5551234567",
+      address: "Şirket adresiniz"
+    },
+    receiver: {
+      name: mockOrder.musteri,
+      phone: mockOrder.telefon,
+      address: `${mockOrder.adres}, ${mockOrder.ilce}/${mockOrder.il}`
+    },
+    package: {
+      weight: 1,
+      description: mockOrder.urunAdi,
+      value: parseInt(mockOrder.tutar.replace(/[^0-9]/g, ''))
+    }
+  };
+  
+  let allResults = [];
+  
+  // Farklı shipment endpoint formatlarını dene
+  const endpoints = ['/v1/shipments', '/api/shipments', '/shipments', '/api/v1/shipments'];
+  
+  for (const baseUrl of POSSIBLE_BASE_URLS) {
+    for (const endpoint of endpoints) {
+      try {
+        const fullUrl = baseUrl + endpoint;
+        const response = await fetch(fullUrl, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${GELIVER_TOKEN}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(geliverOrder)
+        });
+        
+        let result = null;
+        try {
+          result = await response.json();
+        } catch (e) {
+          result = await response.text();
+        }
+        
+        allResults.push({
+          baseUrl: baseUrl,
+          endpoint: endpoint,
+          fullUrl: fullUrl,
+          status: response.status,
+          success: response.ok,
+          data: result,
+          originalOrder: mockOrder,
+          geliverOrder: geliverOrder
+        });
+        
+      } catch (error) {
+        allResults.push({
+          baseUrl: baseUrl,
+          endpoint: endpoint,
+          fullUrl: baseUrl + endpoint,
+          error: error.message,
+          success: false,
+          originalOrder: mockOrder,
+          geliverOrder: geliverOrder
+        });
+      }
+    }
+  }
+  
+  showResult('integrationResult', {
+    message: 'Otomatik entegrasyon test sonuçları',
+    totalAttempts: allResults.length,
+    successfulAttempts: allResults.filter(r => r.success).length,
+    results: allResults,
+    timestamp: new Date().toLocaleString('tr-TR')
+  });
+  
+  const successCount = allResults.filter(r => r.success).length;
+  if (successCount > 0) {
+    updateSystemStatus(`✅ ${successCount} başarılı entegrasyon!`, 'success');
+  } else {
+    updateSystemStatus('❌ Otomatik entegrasyon çalışmıyor', 'error');
+  }
+}
+
+// 6. Curl Komutunu Test Et
+async function testCurlCommand() {
+  const curlCommand = document.getElementById('curlCommand').value.trim();
+  
+  if (!curlCommand) {
+    alert('Lütfen curl komutunu girin!');
+    return;
+  }
+  
+  updateSystemStatus('Curl komutu test ediliyor...', 'warning');
+  
+  try {
+    // Curl komutunu parse et
+    const curlData = parseCurlCommand(curlCommand);
+    
+    if (!curlData.url) {
+      throw new Error('Curl komutunda URL bulunamadı');
+    }
+    
+    // Fetch isteği gönder
+    const response = await fetch(curlData.url, {
+      method: curlData.method || 'GET',
+      headers: curlData.headers || {},
+      body: curlData.body || null
+    });
+    
+    let result = null;
+    try {
+      result = await response.json();
+    } catch (e) {
+      result = await response.text();
+    }
+    
+    showResult('curlResult', {
+      message: 'Curl komutu test sonucu',
+      parsedCurl: curlData,
+      response: {
+        status: response.status,
+        statusText: response.statusText,
+        success: response.ok,
+        data: result
+      },
+      timestamp: new Date().toLocaleString('tr-TR')
+    }, !response.ok);
+    
+    if (response.ok) {
+      updateSystemStatus('✅ Curl komutu başarıyla çalıştı!', 'success');
+    } else {
+      updateSystemStatus('❌ Curl komutu başarısız', 'error');
+    }
+    
+  } catch (error) {
+    showResult('curlResult', `Curl test hatası: ${error.message}`, true);
+    updateSystemStatus('❌ Curl komutu test edilemedi', 'error');
+  }
+}
+
+// Curl komutunu parse et - Geliştirilmiş
+function parseCurlCommand(curlCommand) {
+  const result = {
+    method: 'GET',
+    url: '',
+    headers: {},
+    body: null
+  };
+  
+  try {
+    // URL'yi bul - farklı formatları destekle
+    const urlMatch = curlCommand.match(/--url\s+([^\s\\]+)|curl\s+(?:-X\s+\w+\s+)?(?:-H\s+[^"]*"[^"]*"\s+)*([^\s\\]+)/);
+    if (urlMatch) {
+      result.url = urlMatch[1] || urlMatch[2];
+    }
+    
+    // Method'u bul
+    const methodMatch = curlCommand.match(/--request\s+(\w+)|-X\s+(\w+)/);
+    if (methodMatch) {
+      result.method = methodMatch[1] || methodMatch[2];
+    }
+    
+    // Header'ları bul - farklı formatları destekle
+    const headerMatches = curlCommand.matchAll(/--header\s+'([^']+)'|--header\s+"([^"]+)"|-H\s+'([^']+)'|-H\s+"([^"]+)"/g);
+    for (const match of headerMatches) {
+      const headerValue = match[1] || match[2] || match[3] || match[4];
+      if (headerValue) {
+        const colonIndex = headerValue.indexOf(':');
+        if (colonIndex > 0) {
+          const key = headerValue.substring(0, colonIndex).trim();
+          const value = headerValue.substring(colonIndex + 1).trim();
+          
+          // Bearer token'ı değiştir
+          if (key === 'Authorization' && value.includes('{{bearerToken}}')) {
+            result.headers[key] = `Bearer ${GELIVER_TOKEN}`;
+          } else {
+            result.headers[key] = value;
+          }
+        }
+      }
+    }
+    
+    // Body'yi bul - farklı formatları destekle
+    const bodyMatch = curlCommand.match(/--data\s+'([^']+)'|--data\s+"([^"]+)"|-d\s+'([^']+)'|-d\s+"([^"]+)"/s);
+    if (bodyMatch) {
+      const bodyValue = bodyMatch[1] || bodyMatch[2] || bodyMatch[3] || bodyMatch[4];
+      if (bodyValue) {
+        // JSON formatını temizle
+        const cleanedBody = bodyValue.replace(/\\\n\s*/g, '').replace(/\s+/g, ' ').trim();
+        result.body = cleanedBody;
+      }
+    }
+    
+    return result;
+    
+  } catch (error) {
+    throw new Error(`Curl parse hatası: ${error.message}`);
+  }
+}
+
+// Sayfa yüklendiğinde sistem durumunu güncelle
+window.addEventListener('load', function() {
+  updateSystemStatus('✅ Geliver Test Merkezi hazır!', 'success');
+});
+</script>
+
+</body>
+</html>
